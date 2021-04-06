@@ -24,16 +24,17 @@ Viewer.ViewpointYtop: -4.0
 #--------------------------------------------------------------------------------------------
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera.fx: 256 ---------- we have these ones.
+Camera.fx: 256 
 Camera.fy: 254.4
 Camera.cx: 319.5
 Camera.cy: 239.5
 
-Camera.k1: 0.0 -------------don't have these ones.
-Camera.k2: 0.0
-Camera.p1: 0.0
-Camera.p2: 0.0
-Camera.k3: 0.0
+
+Camera.k1: 1.72689080e-02
+Camera.k2: -8.38585058e-03
+Camera.p1: -2.79442427e-03
+Camera.p2: -1.24960478e-04
+Camera.k3: -7.21633848e-05
 
 #	K(0,0) = width * fx
 #	K(1,1) = height * fy

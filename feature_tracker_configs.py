@@ -23,7 +23,7 @@ from feature_types import FeatureDetectorTypes, FeatureDescriptorTypes, FeatureI
 from feature_matcher import feature_matcher_factory, FeatureMatcherTypes
 
 from parameters import Parameters  
-
+import torch
 
 # some default parameters 
 
@@ -252,3 +252,69 @@ class FeatureTrackerConfigs(object):
                 descriptor_type = FeatureDescriptorTypes.L2NET, 
                 match_ratio_test = kRatioTest,                        
                 tracker_type = kTrackerType) 
+    RFNET = dict(
+        num_features=kNumFeatures,
+        num_levels = 8, 
+        scale_factor = 1.2, 
+        detector_type = FeatureDetectorTypes.RFNET, 
+        descriptor_type = FeatureDescriptorTypes.RFNET, 
+        match_ratio_test = kRatioTest,                        
+        tracker_type = kTrackerType) 
+    
+
+    ### Long list of parameters taken from config.py
+    BATCH_SIZE = 1
+    # Train epoch
+    EPOCH_NUM = 201
+    # Train log interval
+    LOG_INTERVAL = 5
+    # weight decay
+    WEIGHT_DECAY = 1e-4
+    # detector learning rate
+    DET_LR = 0.1
+    # descriptor learning rate
+    DES_LR = 10
+    # detection optimizer (adam/sgd)
+    DET_OPTIMIZER = "adam"
+    # adjust detection lr (sgd/exp)
+    DET_LR_SCHEDULE = "exp"
+    # detector weight decay
+    DET_WD = 0
+    # descriptor optimizer (adam/sgd)
+    DES_OPTIMIZER = "adam"
+    # adjust descriptor lr (sgd/exp)
+    #     DES_LR_SCHEDULE = 'exp'
+    DES_LR_SCHEDULE = "sgd"
+    # descriptor weight decay
+    DES_WD = 0
+    # learning rate decay epoch
+    LR_DECAY_EPOCH = 5
+
+    # learning rate base line
+    LR_BASE = 0.0001
+
+    # score strength weight
+    score_com_strength = 100.0
+
+    # scale strength weight
+    scale_com_strength = 100.0
+
+    # non maximum supression threshold
+    NMS_THRESH = 0.0
+
+    # nms kernel size
+    NMS_KSIZE = 5
+
+    # top k patch
+    TOPK = 512
+
+    SCORE = 1000
+    # pair loss weight
+    PAIR = 1
+    PATCH_SIZE = 32
+    HARDNET_MARGIN = 1.0
+    COO_THRSH = 5.0
+    
+
+
+

@@ -24,7 +24,7 @@ from glob import glob
 
 
 # CHESSBOARD SIZE
-pattern_size = (11, 7)
+pattern_size = (5, 8)
 
 
 def splitfn(fn):
@@ -45,8 +45,10 @@ if __name__ == '__main__':
     else:
         img_mask = img_mask[0]
     print('img_mask: ', img_mask)
+    img_mask = './calib_images/*.jpg'
 
     img_names = glob(img_mask)
+    print('imgnames', img_names)
     debug_dir = args.get('--debug')
     if debug_dir and not os.path.isdir(debug_dir):
         os.mkdir(debug_dir)
@@ -134,3 +136,4 @@ if __name__ == '__main__':
         cv.imwrite(outfile, dst)
 
     cv.destroyAllWindows()
+    print(img_names)

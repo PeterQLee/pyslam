@@ -33,7 +33,8 @@ kVerbose=True
 kMinNumFeature = 2000
 kRansacThresholdNormalized = 0.0003  # metric threshold used for normalized image coordinates 
 kRansacThresholdPixels = 0.1         # pixel threshold used for image coordinates 
-kAbsoluteScaleThreshold = 0.1        # absolute translation scale; it is also the minimum translation norm for an accepted motion 
+#kAbsoluteScaleThreshold = 0.1        # absolute translation scale; it is also the minimum translation norm for an accepted motion
+kAbsoluteScaleThreshold = 0.005
 kUseEssentialMatrixEstimation = True # using the essential matrix fitting algorithm is more robust RANSAC given five-point algorithm solver 
 kRansacProb = 0.999
 kUseGroundTruthScale = True 
@@ -83,6 +84,7 @@ class VisualOdometry(object):
         self.timer_main = TimerFps('VO', is_verbose = self.timer_verbose)
         self.timer_pose_est = TimerFps('PoseEst', is_verbose = self.timer_verbose)
         self.timer_feat = TimerFps('Feature', is_verbose = self.timer_verbose)
+        self.last_scale = None
 
     # get current translation scale from ground-truth if groundtruth is not None 
     def getAbsoluteScale(self, frame_id):  
@@ -164,10 +166,18 @@ class VisualOdometry(object):
         self.des_cur = self.track_result.des_cur 
         self.num_matched_kps = self.kpn_ref.shape[0] 
         self.num_inliers =  np.sum(self.mask_match)
-        if kVerbose:        
-            print('# matched points: ', self.num_matched_kps, ', # inliers: ', self.num_inliers)      
         # t is estimated up to scale (i.e. the algorithm always returns ||trc||=1, we need a scale in order to recover a translation which is coherent with the previous estimated ones)
         absolute_scale = self.getAbsoluteScale(frame_id)
+        if kVerbose:        
+            print('# matched points: ', self.num_matched_kps, ', # inliers: ', self.num_inliers)      
+            
+            print('abs_scale', absolute_scale)
+
+        # if np.isnan(absolute_scale ):
+        #     absolute_scale = self.last_scale
+        # self.last_scale = absolute_scale
+        # print('ls_scale', absolute_scale)
+
         if(absolute_scale > kAbsoluteScaleThreshold):
             # compose absolute motion [Rwa,twa] with estimated relative motion [Rab,s*tab] (s is the scale extracted from the ground truth)
             # [Rwb,twb] = [Rwa,twa]*[Rab,tab] = [Rwa*Rab|twa + Rwa*tab]

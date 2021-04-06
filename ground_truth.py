@@ -46,11 +46,14 @@ def groundtruth_factory(settings):
     print('using groundtruth: ', type)   
     if type == 'kitti':         
         return KittiGroundTruth(path, name, associations, GroundTruthType.KITTI)
-    if type == 'tum':          
+    if type == 'tum' :          
         if 'associations' in settings:
             associations = settings['associations']        
         return TumGroundTruth(path, name, associations, GroundTruthType.TUM)
-    if type == 'video' or type == 'folder':   
+    if type == 'folder':
+        name = settings['groundtruth_file']
+        return TumMonoGroundTruth(path, name, associations, GroundTruthType.SIMPLE)
+    if type == 'video': #or type == 'folder':   
         name = settings['groundtruth_file']
         return SimpleGroundTruth(path, name, associations, GroundTruthType.SIMPLE)     
     else:
@@ -115,6 +118,31 @@ class SimpleGroundTruth(GroundTruth):
         return x,y,z,abs_scale 
 
 
+    ## Specific to tum monoground truth images.
+class TumMonoGroundTruth(GroundTruth):
+    def __init__(self, path, name, associations=None, type = GroundTruthType.KITTI): 
+        super().__init__(path, name, associations, type)
+        self.scale = kScaleSimple
+        self.filename=path + '/' + name
+        with open(self.filename) as f:
+            self.data = f.readlines()
+            self.found = True 
+        if self.data is None:
+            sys.exit('ERROR while reading groundtruth file: please, check how you deployed the files and if the code is consistent with this!') 
+
+    def getPoseAndAbsoluteScale(self, frame_id):
+        ss = self.getDataLine(frame_id-1)
+        x_prev = self.scale*float(ss[1])
+        y_prev = self.scale*float(ss[2])
+        z_prev = self.scale*float(ss[3])     
+        ss = self.getDataLine(frame_id) 
+        x = self.scale*float(ss[1])
+        y = self.scale*float(ss[2])
+        z = self.scale*float(ss[3])
+        abs_scale = np.sqrt((x - x_prev)*(x - x_prev) + (y - y_prev)*(y - y_prev) + (z - z_prev)*(z - z_prev))
+        return x,y,z,abs_scale 
+
+    
 class KittiGroundTruth(GroundTruth):
     def __init__(self, path, name, associations=None, type = GroundTruthType.KITTI): 
         super().__init__(path, name, associations, type)

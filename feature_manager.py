@@ -57,6 +57,9 @@ R2d2Feature2D = import_from('feature_r2d2', 'R2d2Feature2D')
 KeyNetDescFeature2D = import_from('feature_keynet', 'KeyNetDescFeature2D')
 DiskFeature2D = import_from('feature_disk', 'DiskFeature2D')
 
+### RFNET features.
+RFNetFeature2D =  import_from('feature_rfnet', 'RFNetFeature2D')
+
 kVerbose = True   
 
 kNumFeatureDefault = Parameters.kNumFeatures
@@ -477,7 +480,11 @@ class FeatureManager(object):
             self.need_color_image = True               
             self._feature_detector = DiskFeature2D(num_features=self.num_features)          
             #    
-            #                                                                                                                                           
+            #
+
+        elif self.detector_type == FeatureDetectorTypes.RFNET:
+            self._feature_detector = RFNetFeature2D(num_features=self.num_features)     
+        
         else:
             raise ValueError("Unknown feature detector %s" % self.detector_type)
                 
@@ -670,11 +677,19 @@ class FeatureManager(object):
                 self.oriented_features = False                           
                 if self.detector_type != FeatureDetectorTypes.DISK: 
                     raise ValueError("You cannot use DISK internal descriptor without DISK detector!\nPlease, select DISK as both descriptor and detector!")
-                self._feature_descriptor = self._feature_detector  # reuse detector object                                     
-                #
-                #                                                                                                                                                                                                                                                               
+                self._feature_descriptor = self._feature_detector
+                
+            elif self.descriptor_type == FeatureDescriptorTypes.RFNET:
+                self.need_color_image = False
+                if self.detector_type != FeatureDetectorTypes.RFNET:
+                    raise ValueError("You cannot use RFNET internal descriptor without RFNET detector!\nPlease, select KEYNET as both descriptor and detector!")
+                self._feature_descriptor = self._feature_detector
+                
+                                                                  
             elif self.descriptor_type == FeatureDescriptorTypes.NONE:        
-                self._feature_descriptor = None                                              
+                self._feature_descriptor = None
+
+
             else:
                 raise ValueError("Unknown feature descriptor %s" % self.descriptor_type)    
             

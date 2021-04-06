@@ -71,7 +71,13 @@ if __name__ == "__main__":
     # select your tracker configuration (see the file feature_tracker_configs.py) 
     # LK_SHI_TOMASI, LK_FAST
     # SHI_TOMASI_ORB, FAST_ORB, ORB, BRISK, AKAZE, FAST_FREAK, SIFT, ROOT_SIFT, SURF, SUPERPOINT, FAST_TFEAT
+
+    # CHANGE THIS
     tracker_config = FeatureTrackerConfigs.LK_SHI_TOMASI
+    #tracker_config = FeatureTrackerConfigs.SHI_TOMASI_ORB
+    #tracker_config = FeatureTrackerConfigs.RFNET
+
+    
     tracker_config['num_features'] = num_features
     
     feature_tracker = feature_tracker_factory(**tracker_config)
@@ -97,21 +103,35 @@ if __name__ == "__main__":
     is_draw_matched_points = True 
     matched_points_plt = Mplot2d(xlabel='img id', ylabel='# matches',title='# matches')
 
-    img_id = 0
+    im_init = 301
+    im_end = 729
+
+    # im_init = 4059
+    # im_end = 4263
+
+    # im_init = 4342
+    # im_end = 4589
+    
+    #im_end = 1000
+    #im_end = 3000
+    img_id = im_init
     while dataset.isOk():
 
         img = dataset.getImage(img_id)
 
-        if img is not None:
+        if img is not None and None not in img:
 
-            vo.track(img, img_id)  # main VO function 
+            vo.track(img, img_id)  # main VO function
+            if img_id == im_end:
+                break
+                #assert(False)
 
-            if(img_id > 2):	       # start drawing from the third image (when everything is initialized and flows in a normal way)
+            if(img_id-im_init > 2):	       # start drawing from the third image (when everything is initialized and flows in a normal way)
 
                 x, y, z = vo.traj3d_est[-1]
                 x_true, y_true, z_true = vo.traj3d_gt[-1]
-
-                if is_draw_traj_img:      # draw 2D trajectory (on the plane xz)
+                #if is_draw_traj_img:      # draw 2D trajectory (on the plane xz)
+                if is_draw_traj_img and not np.any(np.isnan([x_true,y_true,z_true])):      # draw 2D trajectory (on the plane xz)
                     draw_x, draw_y = int(draw_scale*x) + half_traj_img_size, half_traj_img_size - int(draw_scale*z)
                     true_x, true_y = int(draw_scale*x_true) + half_traj_img_size, half_traj_img_size - int(draw_scale*z_true)
                     cv2.circle(traj_img, (draw_x, draw_y), 1,(img_id*255/4540, 255-img_id*255/4540, 0), 1)   # estimated from green to blue
@@ -127,17 +147,22 @@ if __name__ == "__main__":
                     if kUsePangolin:
                         viewer3D.draw_vo(vo)   
                     else:
-                        plt3d.drawTraj(vo.traj3d_gt,'ground truth',color='r',marker='.')
-                        plt3d.drawTraj(vo.traj3d_est,'estimated',color='g',marker='.')
+                        mask = np.any(~np.isnan(np.array(vo.traj3d_gt)), axis=1)
+                        
+                        plt3d.drawTraj(np.array(vo.traj3d_gt)[mask],'ground truth',color='r',marker='.')
+                        plt3d.drawTraj(np.array(vo.traj3d_est)[mask],'estimated',color='g',marker='.')
+                        # plt3d.drawTraj(np.array(vo.traj3d_est),'estimated',color='g',marker='.')
                         plt3d.refresh()
 
-                if is_draw_err:         # draw error signals 
+                if is_draw_err and not np.any(np.isnan([x_true,y_true,z_true])):         # draw error signals 
                     errx = [img_id, math.fabs(x_true-x)]
                     erry = [img_id, math.fabs(y_true-y)]
                     errz = [img_id, math.fabs(z_true-z)] 
                     err_plt.draw(errx,'err_x',color='g')
                     err_plt.draw(erry,'err_y',color='b')
                     err_plt.draw(errz,'err_z',color='r')
+                    err_plt.refresh()    
+                else:
                     err_plt.refresh()    
 
                 if is_draw_matched_points:
@@ -158,7 +183,9 @@ if __name__ == "__main__":
 
     #print('press a key in order to exit...')
     #cv2.waitKey(0)
-
+    mask = np.any(~np.isnan(vo.traj3d_gt), axis=1)
+    print('any',np.any(mask))
+    print(vo.traj3d_est)
     if is_draw_traj_img:
         print('saving map.png')
         cv2.imwrite('map.png', traj_img)
