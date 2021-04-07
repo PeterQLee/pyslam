@@ -73,9 +73,9 @@ if __name__ == "__main__":
     # SHI_TOMASI_ORB, FAST_ORB, ORB, BRISK, AKAZE, FAST_FREAK, SIFT, ROOT_SIFT, SURF, SUPERPOINT, FAST_TFEAT
 
     # CHANGE THIS
-    tracker_config = FeatureTrackerConfigs.LK_SHI_TOMASI
+    #tracker_config = FeatureTrackerConfigs.LK_SHI_TOMASI
     #tracker_config = FeatureTrackerConfigs.SHI_TOMASI_ORB
-    #tracker_config = FeatureTrackerConfigs.RFNET
+    tracker_config = FeatureTrackerConfigs.RFNET
 
     
     tracker_config['num_features'] = num_features
@@ -103,17 +103,49 @@ if __name__ == "__main__":
     is_draw_matched_points = True 
     matched_points_plt = Mplot2d(xlabel='img id', ylabel='# matches',title='# matches')
 
-    im_init = 301
-    im_end = 729
+    #[[1,0,0],[0,-1,0],[0,0,-1]]
+    # im_init = 301
+    # im_end = 729
 
+    #[[1,0,0],[0,1,0],[0,0,-1]]
     # im_init = 4059
     # im_end = 4263
 
+    #[[-1,0,0],[0,1,0],[0,0,-1]]
     # im_init = 4342
     # im_end = 4589
-    
-    #im_end = 1000
-    #im_end = 3000
+
+
+    #seqence_id = 9
+    #[1,0,0],[0,1,0],[0,0,1]
+    # im_init = 84
+    # im_end = 306
+
+    #[1,0,0],[0,-1,0],[0,0,-1]
+    # im_init = 1720
+    # im_end = 2236
+
+
+    #seq 12
+    # [[-1,0,0],[0,1,0],[0,0,1]]
+    # im_init = 4
+    # im_end = 216
+
+    # [[0,-1,0],[-1,0,0],[0,0,1]]
+    # im_init = 1947
+    # im_end = 2076
+
+    # [[0,-1,0],[-1,0,0],[0,0,1]]
+    # im_init = 2107
+    # im_end = 2198
+
+    # seq 18
+    # im_init = 14
+    # im_end = 578
+
+    # im_init = 5644
+    # im_end = 6196
+
     img_id = im_init
     while dataset.isOk():
 

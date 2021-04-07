@@ -189,4 +189,9 @@ class FeatureInfo(object):
     max_descriptor_distance[FeatureDescriptorTypes.BEBLID] = 110        # BEBLID     (BEBLID_SIZE_256_BITS)
     #
     norm_type[FeatureDescriptorTypes.DISK] = cv2.NORM_L2   
-    max_descriptor_distance[FeatureDescriptorTypes.DISK] = 3.1          # DISK   
+    max_descriptor_distance[FeatureDescriptorTypes.DISK] = 3.1          # DISK
+
+    #
+    norm_type[FeatureDescriptorTypes.RFNET] = cv2.NORM_L2
+    max_descriptor_distance[FeatureDescriptorTypes.RFNET] = 1.0 #RFNet. Taken as DES_THRSH in RFNet configuration files
+    #

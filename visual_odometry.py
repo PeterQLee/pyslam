@@ -21,6 +21,9 @@ import numpy as np
 import cv2
 from enum import Enum
 
+#PL: tools for computing initial rotation
+from scipy.spatial.transform import Rotation
+
 from feature_tracker import FeatureTrackerTypes, FeatureTrackingResult
 from utils_geom import poseRt
 from timer import TimerFps
@@ -34,7 +37,8 @@ kMinNumFeature = 2000
 kRansacThresholdNormalized = 0.0003  # metric threshold used for normalized image coordinates 
 kRansacThresholdPixels = 0.1         # pixel threshold used for image coordinates 
 #kAbsoluteScaleThreshold = 0.1        # absolute translation scale; it is also the minimum translation norm for an accepted motion
-kAbsoluteScaleThreshold = 0.005
+#kAbsoluteScaleThreshold = 0.005
+kAbsoluteScaleThreshold = 0.0001
 kUseEssentialMatrixEstimation = True # using the essential matrix fitting algorithm is more robust RANSAC given five-point algorithm solver 
 kRansacProb = 0.999
 kUseGroundTruthScale = True 
@@ -151,6 +155,7 @@ class VisualOdometry(object):
         self.kps_ref = np.array([x.pt for x in self.kps_ref], dtype=np.float32) 
         self.draw_img = self.drawFeatureTracks(self.cur_image)
 
+
     def processFrame(self, frame_id):
         # track features 
         self.timer_feat.start()
@@ -212,7 +217,21 @@ class VisualOdometry(object):
             self.processFrame(frame_id)
         elif(self.stage == VoStage.NO_IMAGES_YET):
             self.processFirstFrame()
-            self.stage = VoStage.GOT_FIRST_IMAGE            
+            self.stage = VoStage.GOT_FIRST_IMAGE
+
+            #PL: set initial rotation to that of the ground truth.
+            # self.cur_R = np.array([[0,-1,0],[-1,0,0],[0,0,1]])@Rotation.from_quat(self.groundtruth.getQuaternion(frame_id)).as_matrix()
+            qt = self.groundtruth.getQuaternion(frame_id)
+            #qt = np.concatenate((qt[1:4] , [qt[0]]))
+            #a = qt[2]
+            #qt[2] = qt[3]
+            #qt[3] = a
+            #qt[0:3] = np.flip(qt[0:3])
+            #self.cur_R = np.array([[0,-1,0],[-1,0,0],[0,0,1]])@Rotation.from_quat(qt).as_matrix()
+            #self.cur_R = np.array([[-1,0,0],[0,1,0],[0,0,1]])@Rotation.from_quat(qt).as_matrix()
+            #self.cur_R = Rotation.from_quat(qt).as_matrix()
+            #self.cur_R = np.array([[1,0,0],[0,-1,0],[0,0,-1]])@Rotation.from_quat(qt).as_matrix()
+            self.cur_R = np.array([[-1,0,0],[0,-1,0],[0,0,-1]])@Rotation.from_quat(qt).as_matrix()
         self.prev_image = self.cur_image    
         # update main timer (for profiling)
         self.timer_main.refresh()  

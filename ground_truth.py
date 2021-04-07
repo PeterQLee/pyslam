@@ -22,6 +22,7 @@ import numpy as np
 from enum import Enum
 
 
+
 class GroundTruthType(Enum):
     NONE = 1
     KITTI = 2
@@ -132,17 +133,21 @@ class TumMonoGroundTruth(GroundTruth):
 
     def getPoseAndAbsoluteScale(self, frame_id):
         ss = self.getDataLine(frame_id-1)
-        x_prev = self.scale*float(ss[1])
-        y_prev = self.scale*float(ss[2])
+        x_prev = self.scale*(float(ss[1]))
+        y_prev = self.scale*(float(ss[2]))
         z_prev = self.scale*float(ss[3])     
         ss = self.getDataLine(frame_id) 
-        x = self.scale*float(ss[1])
-        y = self.scale*float(ss[2])
+        x = self.scale*(float(ss[1]))
+        y = self.scale*(float(ss[2]))
         z = self.scale*float(ss[3])
         abs_scale = np.sqrt((x - x_prev)*(x - x_prev) + (y - y_prev)*(y - y_prev) + (z - z_prev)*(z - z_prev))
         return x,y,z,abs_scale 
 
-    
+    # PL: modification to get rotation information
+    def getQuaternion(self, frame_id):
+        ss = self.getDataLine(frame_id-1)
+        return np.array([float(i) for i in ss[4:8]])
+
 class KittiGroundTruth(GroundTruth):
     def __init__(self, path, name, associations=None, type = GroundTruthType.KITTI): 
         super().__init__(path, name, associations, type)
@@ -204,6 +209,7 @@ class TumGroundTruth(GroundTruth):
         abs_scale = np.sqrt((x - x_prev)*(x - x_prev) + (y - y_prev)*(y - y_prev) + (z - z_prev)*(z - z_prev))
         return x,y,z,abs_scale 
 
+        
     @staticmethod
     def associate(first_list, second_list, offset=0, max_difference=0.02):
         """

@@ -58,7 +58,8 @@ KeyNetDescFeature2D = import_from('feature_keynet', 'KeyNetDescFeature2D')
 DiskFeature2D = import_from('feature_disk', 'DiskFeature2D')
 
 ### RFNET features.
-RFNetFeature2D =  import_from('feature_rfnet', 'RFNetFeature2D')
+#RFNetFeature2D =  import_from('feature_rfnet', 'RFNetFeature2D')
+from feature_rfnet import RFNetFeature2D
 
 kVerbose = True   
 
