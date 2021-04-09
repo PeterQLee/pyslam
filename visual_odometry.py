@@ -90,6 +90,10 @@ class VisualOdometry(object):
         self.timer_feat = TimerFps('Feature', is_verbose = self.timer_verbose)
         self.last_scale = None
 
+
+        #PL: rotation matching
+        self.rot_dot = []
+
     # get current translation scale from ground-truth if groundtruth is not None 
     def getAbsoluteScale(self, frame_id):  
         if self.groundtruth is not None and kUseGroundTruthScale:
@@ -202,7 +206,7 @@ class VisualOdometry(object):
         self.updateHistory()           
         
 
-    def track(self, img, frame_id):
+    def track(self, img, frame_id, fix_matrix = np.eye(3)):
         if kVerbose:
             print('..................................')
             print('frame: ', frame_id) 
@@ -220,19 +224,22 @@ class VisualOdometry(object):
             self.stage = VoStage.GOT_FIRST_IMAGE
 
             #PL: set initial rotation to that of the ground truth.
-            # self.cur_R = np.array([[0,-1,0],[-1,0,0],[0,0,1]])@Rotation.from_quat(self.groundtruth.getQuaternion(frame_id)).as_matrix()
             qt = self.groundtruth.getQuaternion(frame_id)
-            #qt = np.concatenate((qt[1:4] , [qt[0]]))
-            #a = qt[2]
-            #qt[2] = qt[3]
-            #qt[3] = a
-            #qt[0:3] = np.flip(qt[0:3])
-            #self.cur_R = np.array([[0,-1,0],[-1,0,0],[0,0,1]])@Rotation.from_quat(qt).as_matrix()
-            #self.cur_R = np.array([[-1,0,0],[0,1,0],[0,0,1]])@Rotation.from_quat(qt).as_matrix()
-            #self.cur_R = Rotation.from_quat(qt).as_matrix()
-            #self.cur_R = np.array([[1,0,0],[0,-1,0],[0,0,-1]])@Rotation.from_quat(qt).as_matrix()
-            self.cur_R = np.array([[-1,0,0],[0,-1,0],[0,0,-1]])@Rotation.from_quat(qt).as_matrix()
-        self.prev_image = self.cur_image    
+ 
+            self.cur_R = fix_matrix@Rotation.from_quat(qt).as_matrix()
+        self.prev_image = self.cur_image
+        
+
+        #PL: log rotation alignment
+
+        qt = self.groundtruth.getQuaternion(frame_id)
+        if np.any(np.isnan(qt)):
+            self.rot_dot.append(0)
+        else:
+            gt_q = Rotation.from_matrix(fix_matrix@Rotation.from_quat(qt).as_matrix()).as_quat()
+            est_q = Rotation.from_matrix(self.cur_R).as_quat()
+            self.rot_dot.append(np.dot(gt_q,est_q))
+        
         # update main timer (for profiling)
         self.timer_main.refresh()  
   

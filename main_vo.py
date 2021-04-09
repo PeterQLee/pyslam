@@ -103,35 +103,35 @@ if __name__ == "__main__":
     is_draw_matched_points = True 
     matched_points_plt = Mplot2d(xlabel='img id', ylabel='# matches',title='# matches')
 
-    #[[1,0,0],[0,-1,0],[0,0,-1]]
+    # rotmat = np.array([[1,0,0],[0,-1,0],[0,0,-1]])
     # im_init = 301
     # im_end = 729
 
-    #[[1,0,0],[0,1,0],[0,0,-1]]
+    # rotmat = np.array([[1,0,0],[0,1,0],[0,0,-1]])
     # im_init = 4059
     # im_end = 4263
 
-    #[[-1,0,0],[0,1,0],[0,0,-1]]
+    # rotmat = np.array([[0,0,-1],[0,-1,0],[-1,0,0]])
     # im_init = 4342
     # im_end = 4589
 
 
     #seqence_id = 9
-    #[1,0,0],[0,1,0],[0,0,1]
+    #[[1,0,0],[0,1,0],[0,0,1]]
     # im_init = 84
     # im_end = 306
 
-    #[1,0,0],[0,-1,0],[0,0,-1]
+    #[[1,0,0],[0,-1,0],[0,0,-1]]
     # im_init = 1720
     # im_end = 2236
 
 
     #seq 12
-    # [[-1,0,0],[0,1,0],[0,0,1]]
-    # im_init = 4
-    # im_end = 216
+    rotmat = np.array([[0,0,1],[0,-1,0],[-1,0,0]])
+    im_init = 4
+    im_end = 216
 
-    # [[0,-1,0],[-1,0,0],[0,0,1]]
+    # rotmat = np.array([[0,-1,0],[-1,0,0],[0,0,1]])
     # im_init = 1947
     # im_end = 2076
 
@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
         if img is not None and None not in img:
 
-            vo.track(img, img_id)  # main VO function
+            vo.track(img, img_id, rotmat)  # main VO function
             if img_id == im_end:
                 break
                 #assert(False)
